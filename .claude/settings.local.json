@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rsync -a /private/tmp/claude-501/-Users-emil008-art-battle/05b71ac3-e0e5-4c32-aa10-1d6d8667e831/scratchpad/art-battle-scaffold/ /Users/emil008/art-battle/)",
+      "Bash(npm install *)",
+      "Skill(fewer-permission-prompts)",
+      "Skill(fewer-permission-prompts:*)"
+    ]
+  }
+}

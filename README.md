@@ -1,6 +1,6 @@
 # Art Battle
 
-Мультиплеерная игра: 5 игроков получают одну референс-картинку, 10 минут рисуют её (в canvas или фото с бумаги),
+Мультиплеерная игра: 5 игроков получают одну референс-картинку, 2 минуты рисуют её (в canvas или фото с бумаги),
 голосуют друг за друга лайк/дизлайк, победитель получает XP, а результат раунда постится в Telegram-группу.
 
 ## Стек
@@ -35,22 +35,7 @@ npm run dev
 | `TELEGRAM_BOT_TOKEN` | Telegram → @BotFather → `/newbot` → выдаст токен |
 | `TELEGRAM_CHAT_ID` | ID группы, куда постить результаты (см. инструкцию ниже) |
 | `ROOM_SIZE` | Кол-во игроков в комнате (по умолчанию 5, для локального теста можно поставить 2) |
-| `DRAWING_SECONDS` | Время на рисование, по умолчанию 600 (10 минут) |
+| `DRAWING_SECONDS` | Время на рисование, по умолчанию 120 (2 минуты) |
 | `VOTING_SECONDS` | Время на голосование, по умолчанию 120 (2 минуты) |
 | `WIN_XP_POOL` | XP за победу, делится поровну между победителями при ничьей (по умолчанию 100) |
 | `PARTICIPATION_XP` | XP за участие без победы (по умолчанию 10) |
-
-### Как получить Google OAuth для Supabase Auth
-
-1. В [Google Cloud Console](https://console.cloud.google.com/) создать проект → APIs & Services → Credentials.
-2. Создать OAuth Client ID типа "Web application".
-3. В Authorized redirect URIs указать `https://<project-ref>.supabase.co/auth/v1/callback` (значение подскажет сама Supabase на странице провайдера).
-4. Полученные Client ID и Client Secret вставить в Supabase Dashboard → Authentication → Providers → Google, включить провайдер.
-5. В код ничего добавлять не нужно — это делается целиком в дашбордах Google/Supabase.
-
-### Как получить Telegram bot token и chat id
-
-1. В Telegram написать [@BotFather](https://t.me/BotFather) → `/newbot` → следовать инструкциям → получить `TELEGRAM_BOT_TOKEN`.
-2. Добавить бота в нужную группу как участника (можно без прав администратора, если группа не супергруппа с ограничениями на отправку фото).
-3. Отправить любое сообщение в группу, затем открыть в браузере
-   `https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getUpdates` — в ответе найти `chat.id` (для групп это отрицательное число).

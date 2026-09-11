@@ -1,26 +1,255 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ab-bg: #16112a;
+  --ab-surface: rgba(255, 255, 255, 0.05);
+  --ab-surface-solid: #2c2350;
+  --ab-line: rgba(255, 255, 255, 0.1);
+  --ab-line-soft: rgba(255, 255, 255, 0.14);
+  --ab-line-dashed: rgba(255, 255, 255, 0.18);
+  --ab-ink: #fff6ee;
+  --ab-ink-55: rgba(255, 246, 238, 0.55);
+  --ab-ink-45: rgba(255, 246, 238, 0.45);
+  --ab-ink-30: rgba(255, 246, 238, 0.32);
+  --ab-mint: #6ff8c9;
+  --ab-mint-ink: #0c2119;
+  --ab-pink: #ff2f7e;
+  --ab-sun: #ffd23f;
+  --ab-sun-ink: #2b1e00;
+  --ab-violet: #8b5cf6;
+  --ab-canvas: #fffdf7;
+
+  /* legacy aliases — не ломаем то, что ещё не переписано на новые токены */
+  --gb-pink: var(--ab-bg);
+  --gb-pink-dark: #0c0a14;
+  --gb-purple: var(--ab-violet);
+  --gb-purple-dark: #4c1d95;
+  --gb-mint: var(--ab-mint);
+  --gb-yellow: var(--ab-sun);
+  --gb-green: #2fd67f;
+  --gb-green-dark: #1aa85f;
+  --gb-orange: #ff7a3d;
+  --gb-red: var(--ab-pink);
+  --gb-red-dark: #c81e45;
+  --gb-paper: var(--ab-canvas);
+  --gb-ring: #372a5c;
+  --gb-ink: var(--ab-ink);
+
+  --background: var(--ab-bg);
+  --foreground: var(--ab-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ab-bg: var(--ab-bg);
+  --color-ab-surface: var(--ab-surface);
+  --color-ab-surface-solid: var(--ab-surface-solid);
+  --color-ab-line: var(--ab-line);
+  --color-ab-ink: var(--ab-ink);
+  --color-ab-mint: var(--ab-mint);
+  --color-ab-mint-ink: var(--ab-mint-ink);
+  --color-ab-pink: var(--ab-pink);
+  --color-ab-sun: var(--ab-sun);
+  --color-ab-sun-ink: var(--ab-sun-ink);
+  --color-ab-violet: var(--ab-violet);
+  --color-ab-canvas: var(--ab-canvas);
+  --color-gb-pink: var(--gb-pink);
+  --color-gb-pink-dark: var(--gb-pink-dark);
+  --color-gb-purple: var(--gb-purple);
+  --color-gb-purple-dark: var(--gb-purple-dark);
+  --color-gb-mint: var(--gb-mint);
+  --color-gb-yellow: var(--gb-yellow);
+  --color-gb-green: var(--gb-green);
+  --color-gb-green-dark: var(--gb-green-dark);
+  --color-gb-orange: var(--gb-orange);
+  --color-gb-red: var(--gb-red);
+  --color-gb-red-dark: var(--gb-red-dark);
+  --color-gb-paper: var(--gb-paper);
+  --color-gb-ring: var(--gb-ring);
+  --color-gb-ink: var(--gb-ink);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
 body {
-  background: var(--background);
+  background: var(--ab-bg);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, sans-serif;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ab-mint);
+  outline-offset: 3px;
+}
+
+@layer components {
+  .ab-display {
+    font-family: var(--font-display);
+  }
+
+  .ab-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* Кнопки — без теней, глубина цветом. */
+  .ab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition:
+      filter 140ms ease-out,
+      border-color 140ms ease-out,
+      background-color 140ms ease-out,
+      transform 80ms ease-out;
+  }
+
+  .ab-btn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .ab-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .ab-btn-primary {
+    background: var(--ab-mint);
+    color: var(--ab-mint-ink);
+    font-family: var(--font-display);
+    font-weight: 800;
+    border-radius: 16px;
+    padding: 17px 32px;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+  }
+
+  .ab-btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+
+  .ab-btn-secondary {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.16);
+    color: var(--ab-ink);
+    font-family: var(--font-sans);
+    font-weight: 700;
+    border-radius: 16px;
+    padding: 15px 28px;
+    font-size: 14px;
+  }
+
+  .ab-btn-secondary:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.32);
+  }
+
+  .ab-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 246, 238, 0.6);
+    transition:
+      background-color 140ms ease-out,
+      border-color 140ms ease-out,
+      transform 80ms ease-out;
+  }
+
+  .ab-btn-icon:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .ab-btn-icon[data-active="true"] {
+    background: var(--ab-mint);
+    border-color: var(--ab-mint);
+    color: var(--ab-mint-ink);
+  }
+
+  .ab-btn-icon[data-danger="true"] {
+    border-color: rgba(255, 47, 126, 0.35);
+    color: var(--ab-pink);
+  }
+
+  /* Пилюля-стикер: бейджи фаз, статусов, достижений — с лёгким наклоном по месту. */
+  .ab-sticker {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .ab-card {
+    background: var(--ab-surface);
+    border: 2px solid var(--ab-line-soft);
+  }
+
+  .ab-row-hover {
+    transition: background-color 140ms ease-out;
+  }
+
+  .ab-row-hover:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .ab-tilt-hover {
+    transition: transform 140ms ease-out;
+  }
+
+  .ab-tilt-hover:hover {
+    transform: rotate(0deg) scale(1.02);
+  }
+
+  .ab-fade-in {
+    animation: ab-fade-in 260ms ease-out;
+  }
+}
+
+@keyframes ab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ab-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ab-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
