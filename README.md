@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Art Battle
 
-## Getting Started
+Мультиплеерная игра: 5 игроков получают одну референс-картинку, 10 минут рисуют её (в canvas или фото с бумаги),
+голосуют друг за друга лайк/дизлайк, победитель получает XP, а результат раунда постится в Telegram-группу.
 
-First, run the development server:
+## Стек
+
+Next.js (App Router) + Socket.io (через кастомный `server.ts`) + Supabase (Postgres/Auth/Storage) + Telegram Bot API.
+
+Socket.io требует постоянно живущий процесс, поэтому `dev`/`start` запускают `server.ts` через `tsx`, а не `next dev`/`next start`.
+Это значит: деплой — самостоятельный Node-процесс (Docker/VPS/Fly.io/Railway), **не** Vercel serverless.
+
+## Настройка перед первым запуском
+
+1. Скопировать `.env.example` в `.env.local` и заполнить все переменные (см. ниже, что где взять).
+2. Применить `supabase/migrations/0001_init.sql` к своему Supabase-проекту (SQL Editor в дашборде или `supabase db push`).
+3. Создать в Supabase Storage два бакета: `reference-images` (публичный) и `submissions` (приватный).
+4. Загрузить в `reference-images` 5-10 картинок и добавить на них строки в таблицу `reference_images`
+   (`url` = публичный URL картинки, `is_active = true`) — см. `supabase/seed/reference_images.sql`.
+5. Включить Google как провайдера в Supabase Auth → Providers.
+6. Создать Telegram-бота и добавить его в группу.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Переменные окружения
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Переменная | Где взять |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Project Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Dashboard → Project Settings → API → `anon public` key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Dashboard → Project Settings → API → `service_role` key (секретный, не для фронта) |
+| `TELEGRAM_BOT_TOKEN` | Telegram → @BotFather → `/newbot` → выдаст токен |
+| `TELEGRAM_CHAT_ID` | ID группы, куда постить результаты (см. инструкцию ниже) |
+| `ROOM_SIZE` | Кол-во игроков в комнате (по умолчанию 5, для локального теста можно поставить 2) |
+| `DRAWING_SECONDS` | Время на рисование, по умолчанию 600 (10 минут) |
+| `VOTING_SECONDS` | Время на голосование, по умолчанию 120 (2 минуты) |
+| `WIN_XP_POOL` | XP за победу, делится поровну между победителями при ничьей (по умолчанию 100) |
+| `PARTICIPATION_XP` | XP за участие без победы (по умолчанию 10) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Как получить Google OAuth для Supabase Auth
 
-## Learn More
+1. В [Google Cloud Console](https://console.cloud.google.com/) создать проект → APIs & Services → Credentials.
+2. Создать OAuth Client ID типа "Web application".
+3. В Authorized redirect URIs указать `https://<project-ref>.supabase.co/auth/v1/callback` (значение подскажет сама Supabase на странице провайдера).
+4. Полученные Client ID и Client Secret вставить в Supabase Dashboard → Authentication → Providers → Google, включить провайдер.
+5. В код ничего добавлять не нужно — это делается целиком в дашбордах Google/Supabase.
 
-To learn more about Next.js, take a look at the following resources:
+### Как получить Telegram bot token и chat id
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. В Telegram написать [@BotFather](https://t.me/BotFather) → `/newbot` → следовать инструкциям → получить `TELEGRAM_BOT_TOKEN`.
+2. Добавить бота в нужную группу как участника (можно без прав администратора, если группа не супергруппа с ограничениями на отправку фото).
+3. Отправить любое сообщение в группу, затем открыть в браузере
+   `https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getUpdates` — в ответе найти `chat.id` (для групп это отрицательное число).
