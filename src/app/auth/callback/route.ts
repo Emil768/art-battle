@@ -3,8 +3,15 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 
 export const GET = async (request: Request) => {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code");
+  const url = new URL(request.url);
+  const code = url.searchParams.get("code");
+
+  // За reverse-proxy (Timeweb и т.п.) request.url отражает внутренний адрес
+  // контейнера (localhost:PORT), а не публичный домен — берём origin из
+  // X-Forwarded-* заголовков, которые прокси передаёт специально для этого.
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") ?? url.protocol.replace(":", "");
+  const origin = forwardedHost ? `${forwardedProto}://${forwardedHost}` : url.origin;
 
   if (code) {
     const supabase = await createClient();
