@@ -197,19 +197,23 @@ export async function handleSubmit(
   roomId: string,
   imageUrl: string,
   isCanvas: boolean,
-) {
+): Promise<{ ok: true } | { ok: false; reason: string }> {
   const room = rooms.get(roomId);
   const userId = socket.data.userId;
-  if (!room || room.status !== "drawing" || !room.playerIds.includes(userId)) return;
-  if (room.submissions.has(userId)) return;
+  if (!room || !room.playerIds.includes(userId)) return { ok: false, reason: "room_not_in_memory" };
+  // Раунд рисования уже истёк на сервере (таймер сработал раньше, чем дошла
+  // эта отправка) — игрока уже пометили как непредоставившего работу.
+  // Возвращаем честную ошибку вместо тишины, чтобы клиент не показывал
+  // "Отправлено" по рисунку, которого на самом деле нет.
+  if (room.status !== "drawing") return { ok: false, reason: `room_status_${room.status}` };
+  if (room.submissions.has(userId)) return { ok: false, reason: "already_submitted" };
 
   try {
     const submissionId = await insertSubmission(roomId, userId, imageUrl, isCanvas);
     room.submissions.set(userId, { submissionId, imageUrl, isCanvas });
   } catch (err) {
     console.error("[room] failed to persist submission", err);
-    socket.emit("error", { code: "submit_failed", message: "Не удалось сохранить рисунок" });
-    return;
+    return { ok: false, reason: "submit_failed" };
   }
 
   io.to(roomId).emit("player:submitted", {
@@ -221,6 +225,8 @@ export async function handleSubmit(
   if (room.submissions.size === room.playerIds.length) {
     finishDrawingPhase(io, roomId);
   }
+
+  return { ok: true };
 }
 
 export function handleDrawingActivity(io: AppServer, socket: AppSocket, roomId: string) {
@@ -423,15 +429,20 @@ async function finishVotingPhase(io: AppServer, roomId: string) {
     console.error("[room] failed to persist finished status", err);
   }
 
-  const results: RoomResultEntry[] = room.players.map((player) => ({
-    userId: player.id,
-    nickname: player.nickname,
-    avatarUrl: player.avatarUrl,
-    imageUrl: room.votingReadUrls.get(player.id) ?? null,
-    score: scores.get(player.id) ?? 0,
-    expAwarded: expAwarded[player.id] ?? 0,
-    isWinner: winnerIds.includes(player.id),
-  }));
+  const results: RoomResultEntry[] = room.players.map((player) => {
+    const votes = votesByTarget.get(player.id) ?? [];
+    return {
+      userId: player.id,
+      nickname: player.nickname,
+      avatarUrl: player.avatarUrl,
+      imageUrl: room.votingReadUrls.get(player.id) ?? null,
+      score: scores.get(player.id) ?? 0,
+      likes: votes.filter((v) => v === 1).length,
+      dislikes: votes.filter((v) => v === -1).length,
+      expAwarded: expAwarded[player.id] ?? 0,
+      isWinner: winnerIds.includes(player.id),
+    };
+  });
   room.lastResults = results;
 
   io.to(roomId).emit("phase:finished", { results, collagePosted: false });

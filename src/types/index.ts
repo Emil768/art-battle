@@ -19,6 +19,8 @@ export interface RoomResultEntry {
   avatarUrl: string | null;
   imageUrl: string | null;
   score: number;
+  likes: number;
+  dislikes: number;
   expAwarded: number;
   isWinner: boolean;
 }

@@ -32,7 +32,7 @@ export const DrawingPhase = (props: DrawingPhaseProps) => {
   } = useDrawingPhase(props);
 
   return (
-    <div className="flex h-screen flex-col md:flex-row-reverse" style={{ background: "var(--ab-bg)" }}>
+    <div className="flex h-dvh flex-col overflow-hidden md:flex-row-reverse" style={{ background: "var(--ab-bg)" }}>
       <div className="flex min-w-0 flex-1 flex-col">
         <div
           className="flex shrink-0 flex-col gap-2 px-4 py-2.5 md:h-[72px] md:flex-row md:items-center md:justify-between md:px-8 md:py-0"

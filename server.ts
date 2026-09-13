@@ -80,10 +80,13 @@ const main = async () => {
       );
     });
 
-    socket.on("drawing:submit", ({ roomId, imageUrl, isCanvas }) => {
-      handleSubmit(io, socket, roomId, imageUrl, isCanvas).catch((err) =>
-        console.error("[server] handleSubmit failed", err),
-      );
+    socket.on("drawing:submit", ({ roomId, imageUrl, isCanvas }, ack) => {
+      handleSubmit(io, socket, roomId, imageUrl, isCanvas)
+        .then((result) => ack?.(result))
+        .catch((err) => {
+          console.error("[server] handleSubmit failed", err);
+          ack?.({ ok: false, reason: "submit_failed" });
+        });
     });
 
     socket.on("drawing:activity", ({ roomId }) => {

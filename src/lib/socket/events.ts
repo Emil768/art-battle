@@ -5,16 +5,17 @@ import type {
   RoomSubmissionPublic,
 } from "@/types";
 
+export type SubmitAck = { ok: true } | { ok: false; reason: string };
+
 /** Client -> server events. */
 export interface ClientToServerEvents {
   "queue:join": () => void;
   "queue:leave": () => void;
   "room:join": (payload: { roomId: string }) => void;
-  "drawing:submit": (payload: {
-    roomId: string;
-    imageUrl: string;
-    isCanvas: boolean;
-  }) => void;
+  "drawing:submit": (
+    payload: { roomId: string; imageUrl: string; isCanvas: boolean },
+    ack?: (result: SubmitAck) => void,
+  ) => void;
   "voting:vote": (payload: {
     roomId: string;
     targetUserId: string;

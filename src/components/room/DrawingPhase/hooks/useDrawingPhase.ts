@@ -85,7 +85,27 @@ export const useDrawingPhase = ({ socket, roomId, drawingEndsAt }: DrawingPhaseP
         .uploadToSignedUrl(path, token, blob, { upsert: true, contentType: "image/png" });
       if (error) throw error;
 
-      socket.emit("drawing:submit", { roomId, imageUrl: path, isCanvas: true });
+      // Ждём подтверждения от сервера, а не считаем успехом сам факт отправки:
+      // если таймер раунда истёк буквально в этот момент, сервер уже мог
+      // пометить игрока как непредоставившего работу — без ack клиент бы
+      // молча показал "Отправлено" по рисунку, которого на сервере нет.
+      const ack = await new Promise<{ ok: true } | { ok: false; reason: string }>((resolve) => {
+        const timeout = setTimeout(() => resolve({ ok: false, reason: "timeout" }), 8000);
+        socket.emit("drawing:submit", { roomId, imageUrl: path, isCanvas: true }, (result) => {
+          clearTimeout(timeout);
+          resolve(result);
+        });
+      });
+
+      if (!ack.ok && ack.reason !== "already_submitted") {
+        if (ack.reason === "room_not_in_memory" || ack.reason.startsWith("room_status_")) {
+          showStatus("error", "Раунд уже завершился — рисунок не успел засчитаться. Возвращаемся в лобби...");
+          setTimeout(() => router.push("/lobby"), 2000);
+          return;
+        }
+        throw new Error(`submit rejected: ${ack.reason}`);
+      }
+
       setSubmitted(true);
       showStatus("success", "Работа отправлена!");
     } catch (err) {

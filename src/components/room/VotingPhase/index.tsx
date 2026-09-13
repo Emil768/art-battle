@@ -11,7 +11,10 @@ import type { VotingPhaseProps } from "./types";
 const TILTS = ["-1.2deg", "1deg", "-.6deg", "1.4deg"];
 
 const StatusSticker = ({ votedCount, totalCount }: { votedCount: number; totalCount: number }) => (
-  <span className="ab-sticker px-4 py-2 text-xs text-white" style={{ background: "var(--ab-pink)" }}>
+  <span
+    className="ab-sticker hidden px-4 py-2 text-xs text-white md:inline-flex"
+    style={{ background: "var(--ab-pink)" }}
+  >
     Голосование · {votedCount} из {totalCount}
   </span>
 );

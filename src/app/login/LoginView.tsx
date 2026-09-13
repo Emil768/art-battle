@@ -7,14 +7,24 @@ export const LoginView = ({ steps }: LoginViewProps) => {
   const { handleGoogleLogin, loading, error } = useLogin();
 
   return (
-    <main className="flex min-h-screen flex-col md:flex-row" style={{ background: "var(--ab-bg)" }}>
+    <main
+      className="flex min-h-screen flex-col md:flex-row"
+      style={{ background: "var(--ab-bg)" }}
+    >
       <div className="flex flex-1 flex-col justify-center gap-5 px-6 py-14 md:gap-[26px] md:px-16 md:py-16">
         <div className="flex items-center gap-[11px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-mark.png" alt="" className="h-8 w-8 md:h-[38px] md:w-[38px]" />
+          <img
+            src="/logo-mark.png"
+            alt=""
+            className="h-8 w-8 md:h-[38px] md:w-[38px]"
+          />
           <span
             className="text-[15px] font-extrabold tracking-[-0.01em] md:text-[17px]"
-            style={{ fontFamily: "var(--font-display)", color: "var(--ab-ink)" }}
+            style={{
+              fontFamily: "var(--font-display)",
+              color: "var(--ab-ink)",
+            }}
           >
             ART BATTLE
           </span>
@@ -33,8 +43,7 @@ export const LoginView = ({ steps }: LoginViewProps) => {
           className="max-w-[400px] text-[15px] font-medium leading-[1.55]"
           style={{ color: "rgba(255,246,238,.62)" }}
         >
-          Один аккаунт на всё: рейтинг, ваши работы и уровень. Регистрация не нужна — просто
-          войдите через Google.
+          Рейтинг, ваши работы и уровень сохраняются автоматически.
         </p>
 
         <div className="flex flex-col items-start gap-3">
@@ -48,8 +57,17 @@ export const LoginView = ({ steps }: LoginViewProps) => {
           </button>
 
           {error && (
-            <div className="flex flex-wrap items-center gap-3 rounded-[14px] px-4 py-3" style={{ background: "rgba(255,47,126,.12)", border: "2px solid rgba(255,47,126,.35)" }}>
-              <span className="text-sm font-medium" style={{ color: "var(--ab-ink)" }}>
+            <div
+              className="flex flex-wrap items-center gap-3 rounded-[14px] px-4 py-3"
+              style={{
+                background: "rgba(255,47,126,.12)",
+                border: "2px solid rgba(255,47,126,.35)",
+              }}
+            >
+              <span
+                className="text-sm font-medium"
+                style={{ color: "var(--ab-ink)" }}
+              >
                 Не получилось войти. Попробуйте ещё раз.
               </span>
               <button
@@ -73,7 +91,10 @@ export const LoginView = ({ steps }: LoginViewProps) => {
       <div className="flex flex-col justify-center gap-4 border-t-2 border-[rgba(255,255,255,.1)] px-6 py-10 md:w-[520px] md:gap-[22px] md:border-l-2 md:border-t-0 md:px-12 md:py-16">
         <span
           className="w-fit -rotate-2 rounded-full px-3.5 py-[7px] text-[11px] font-extrabold tracking-[0.12em] text-white"
-          style={{ background: "var(--ab-violet)", fontFamily: "var(--font-sans)" }}
+          style={{
+            background: "var(--ab-violet)",
+            fontFamily: "var(--font-sans)",
+          }}
         >
           КАК ЭТО РАБОТАЕТ
         </span>
@@ -86,15 +107,25 @@ export const LoginView = ({ steps }: LoginViewProps) => {
           >
             <div
               className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[14px] text-[17px] font-extrabold md:h-10 md:w-10"
-              style={{ background: step.tile, color: step.tileText, fontFamily: "var(--font-display)" }}
+              style={{
+                background: step.tile,
+                color: step.tileText,
+                fontFamily: "var(--font-display)",
+              }}
             >
               {step.n}
             </div>
             <div>
-              <p className="text-[15px] font-extrabold" style={{ color: "var(--ab-ink)" }}>
+              <p
+                className="text-[15px] font-extrabold"
+                style={{ color: "var(--ab-ink)" }}
+              >
                 {step.title}
               </p>
-              <p className="mt-[7px] text-[13px] font-semibold leading-[1.4]" style={{ color: "rgba(255,246,238,.5)" }}>
+              <p
+                className="mt-[7px] text-[13px] font-semibold leading-[1.4]"
+                style={{ color: "rgba(255,246,238,.5)" }}
+              >
                 {step.text}
               </p>
             </div>
